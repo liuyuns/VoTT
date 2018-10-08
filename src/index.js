@@ -275,7 +275,11 @@ function openPath(pathName, isDir) {
           if (config.tag_colors){
             videotagging.optionalTags.colors = config.tag_colors;
           }
-            videotagging.inputframes = config.frames;
+
+          // load frames.
+          config.frames = {}
+
+          videotagging.inputframes = config.frames;
           visitedFrames = new Set(config.visitedFrames);
         } else {
           videotagging.inputframes = {};
@@ -294,6 +298,19 @@ function openPath(pathName, isDir) {
 
             if (videotagging.imagelist.length){
               videotagging.imagelist = videotagging.imagelist.map((filepath) => {return path.join(pathName,filepath)});
+
+              // load frames:
+              for (var i=0; i< videotagging.imagelist.length; i++){
+                var image = videotagging.imagelist[i];
+                var framePath = image.replace('images', 'frames') + '.json';
+                try{
+                  videotagging.inputframes[path.basename(image)] = require(framePath)
+                }catch(e){
+
+                }
+              }
+
+
               videotagging.src = pathName; 
               //track visited frames
               $("#video-tagging").off("stepFwdClicked-AfterStep", updateVisitedFrames);
@@ -357,7 +374,7 @@ function openPath(pathName, isDir) {
 //saves current video to config 
 function save() {
     var saveObject = {
-      "frames" : videotagging.frames,
+      // "frames" : videotagging.frames,
       "framerate":$('#framerate').val(),
       "inputTags": $('#inputtags').val().replace(/\s/g,''),
       "suggestiontype": $('#suggestiontype').val(),
@@ -365,6 +382,17 @@ function save() {
       "visitedFrames": Array.from(visitedFrames),
       "tag_colors" : videotagging.optionalTags.colors,
     };
+
+
+    // Save frames
+
+    var frames = videotagging.frames
+    var baseFolder = path.join(videotagging.src, "..")
+    for (var frame in frames){
+      var filepath = `${baseFolder}\\frames\\${frame}.json`
+      fs.writeFileSync(filepath, JSON.stringify(frames[frame]))
+    }
+
     //if nothing changed don't save
     if (saveState === JSON.stringify(saveObject) ) {
       return;

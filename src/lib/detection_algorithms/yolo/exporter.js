@@ -109,15 +109,18 @@ function Exporter(exportDirPath, classes, taggedFramesCount, frameWidth, frameHe
     //         of the bounding boxes (respectively), and 'class' is the name of the class.
     // Returns: A Promise object that resolves when the operation completes
     this.exportFrame = function exportFrame(frameFileName, frameBuffer, tags) {
+        debugger;
         return new Promise((resolve, reject) => {
             async.waterfall([
-                detectionUtils.ensureDirExists.bind(null, self.imagesDirPath),
+                detectionUtils.ensureDirExists.bind(null, path.join(self.imagesDirPath, ".")),
+                detectionUtils.ensureDirExists.bind(null, path.join(self.imagesDirPath, "images")),
+                detectionUtils.ensureDirExists.bind(null, path.join(self.imagesDirPath, "labels")),
                 function saveImage(cb) {
-                    var imageFilePath = path.join(self.imagesDirPath, frameFileName);
+                    var imageFilePath = path.join(self.imagesDirPath, "images", frameFileName);
                     fs.writeFile(imageFilePath, frameBuffer, cb); 
                 },
                 function saveBBoxesData(cb) {
-                    imageDataFilePath = path.join(self.imagesDirPath, path.parse(frameFileName).name + '.txt');
+                    imageDataFilePath = path.join(self.imagesDirPath, "labels", path.parse(frameFileName).name + '.txt');
                     var bboxesData = '';
                     for (var i in tags) {
                         if (i > 0) {

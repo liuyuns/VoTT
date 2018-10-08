@@ -127,15 +127,22 @@ function Detection(videotagging, visitedFrames) {
             });
 
         function exportFrame(exporter, frameName, frameId, frameCanvas, canvasContext, frameExportCb) {
-            if (!self.visitedFrames.has(frameId)) {
+            if (!self.visitedFrames.has(frameName)) {
                 return frameExportCb();
             }
             var frameTags = [];
+            var frames = self.videotagging.frames;
+
             //confirm that frame is tagged and that no tags are unlabeled 
-            var frameIsTagged = self.videotagging.frames.hasOwnProperty(frameId) && (self.videotagging.frames[frameId].length);
-            if (frameIsTagged && (self.videotagging.getUnlabeledRegionTags(frameId).length != self.videotagging.frames[frameId].length)) {
+            // FrameId or FrameName
+            var frameIsTagged = !!frames[frameName]
+            var frame = frames[frameName] || []
+            
+            
+            // if (frameIsTagged && (self.videotagging.getUnlabeledRegionTags(frameId).length != self.videotagging.frames[frameId].length)) {
+            if (frameIsTagged){
                 //genereate metadata from tags
-                self.videotagging.frames[frameId].map((tag) => {
+                frame.map((tag) => {
                     if (!tag.tags[tag.tags.length - 1]) {
                         return console.log(`frame ${frameId} region ${tag.name} has no label`);
                     }

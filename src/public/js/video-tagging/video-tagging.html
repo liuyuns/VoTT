@@ -515,13 +515,14 @@
     nextUntaggedClicked:function() {
         if (this.checkRegionLabels()){
           var frameIndex = this.getCurrentFrame();
+          frameIndex = Number.MAX_VALUE
             if (this.imagelist){//image handling
                 var lastTagIndex = parseInt(Object.keys(this.frames)[Object.keys(this.frames).length-1])
                 if (this.imageIndex < this.imagelist.length) {
                     if (lastTagIndex <= frameIndex){
                         this.imageIndex++;
                     } else {
-                        this.imageIndex = lastTagIndex;
+                        this.imageIndex = lastTagIndex || 0;
                     }
                     this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
                     this.playingCallback();
@@ -806,7 +807,8 @@
     },
     getCurrentFrame: function() {
       if (this.imagelist){
-        return this.imageIndex;
+          var imagePath = this.imagelist[this.imageIndex || 0]
+          return path.basename(imagePath);
       } 
       return this.video.currentTime === 0 ? 1 : Math.ceil((this.video.currentTime - this.videoStartTime) * this.framerate) + 1 ;
     },
