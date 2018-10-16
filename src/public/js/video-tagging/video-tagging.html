@@ -952,7 +952,8 @@
                         self.deleteRegion();
                     }
                     break;
-                    default: return; // exit this handler for other keys
+                    default: 
+                        self.keyupHandler(e.keyCode) // exit this handler for other keys
                 }
                 e.preventDefault(); // prevent the default action (scroll / move caret)
             };
@@ -1176,6 +1177,26 @@
             }
                         
             this.showAllRegions();
+    },
+
+    keyupHandler:function(keyCode){
+        if(keyCode > '0'.charCodeAt(0) && keyCode <= '9'.charCodeAt(0))
+        {
+            var index = keyCode - '1'.charCodeAt(0);
+            if(index>=this.inputtagsarray.length)
+                return;
+            
+            var tagId = this.inputtagsarray[index];
+            var currentAllFrames = this.frames[this.getCurrentFrame()];
+            if(this.selectedRegionId === 0)
+                this.selectedRegionId = currentAllFrames.length;
+
+            var lastRegion = currentAllFrames[this.selectedRegionId-1];
+            if(lastRegion.tags.indexOf(tagId) !== -1)
+                return;
+        
+            this.fire('ontagsubmitted', {tagid:tagId});
+        }
     },
     displayVideoTime: function() {
             var currentTime = Math.round(this.video.currentTime);
