@@ -47,6 +47,9 @@
 
             <tr>
               <td class="videoControlCell simpleControl clickableControl">
+                    <span id="firstStep" title="first" class="icon-first taggingControls" on-click='firstStepClick'></span>
+              </td>
+              <td class="videoControlCell simpleControl clickableControl">
                 <span id="stepbwd" title="prev" class="icon-backward2 taggingControls" on-click='stepBwdClicked'></span>
               </td>
               <td class="videoControlCell simpleControl clickableControl" style="display: none">
@@ -1098,6 +1101,20 @@
         }
         if(fireEvents)$('#video-tagging').trigger('stepBwdClicked-AfterStep');    
     },
+    firstStepClick:function(fireEvents = true) {
+        if(this.imageIndex === 0)
+            return; 
+        if (this.checkRegionLabels()){
+            //raise before next frame  
+            if (this.imagelist){//image handling
+                if(fireEvents)$('#video-tagging').trigger('stepFwdClicked-BeforeStep');    
+                this.imageIndex = 0;
+                this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
+                this.playingCallback();
+            }
+            if(fireEvents)$('#video-tagging').trigger('stepFwdClicked-AfterStep');
+        }
+    },
     videoSrcChanged: function(newValue, oldValue) {
           if(this.video){
              if (this.imagelist){
@@ -1152,7 +1169,7 @@
                 this.updateFrameCanvas(this.video);
 
             } else{
-                this.frameText.innerHTML = `${this.getCurrentFrame() + 1}/${this.imagelist.length}`;
+                this.frameText.innerHTML = `${this.getCurrentFrame()}   ${this.imageIndex+1}/${this.imagelist.length}`;
                 
                 // Update canvas image based on new video frame
                 this.updateFrameCanvas(this.curImg);
