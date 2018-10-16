@@ -388,8 +388,12 @@ function save() {
 
     var frames = videotagging.frames
     var baseFolder = path.join(videotagging.src, "..")
+    baseFolder = path.join(baseFolder, "frames")
+    if(!fs.existsSync(baseFolder)){
+      fs.mkdirSync(baseFolder);
+    }
     for (var frame in frames){
-      var filepath = `${baseFolder}\\frames\\${frame}.json`
+      var filepath = `${baseFolder}\\${frame}.json`
       fs.writeFileSync(filepath, JSON.stringify(frames[frame]))
     }
 
