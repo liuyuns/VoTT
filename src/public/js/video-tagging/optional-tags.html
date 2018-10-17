@@ -13,6 +13,7 @@
         <div id = "tagsContainer">
              <div id = "buttonsContainer"></div>
            </div>
+           <span id="filterAll" title="filter all" class="taggingControls controlOff" on-click='filterImagesByTag'> FilterImageByTag </span>
    </template>
    <script>
 
@@ -21,6 +22,8 @@
        is: 'optional-tags',
 
        properties: { 
+           filterImageByTagEnabled: false,
+           filterImageTagId:""
        },
        attached: function() {
              this.tagsContainer = this.$$('#tagsContainer');
@@ -45,6 +48,10 @@
                       self.fire('ontagdeleted', {tagid:e.target.id});
                   }
                   else {
+                      if(self.filterImageByTagEnabled && e.target.id !== self.filterImageTagId){
+                          alert("Fail to select a differnt tag when FilterImageByTag is enable.");
+                          return;
+                      }
                       self.setSelected(e.target);
                       self.fire('ontagsubmitted', {tagid:e.target.id});
                   }
@@ -91,6 +98,29 @@
             });
        },
 
+       toggleEnableFilterImage:function(enable){
+           var filterControl = this.$$("#filterAll");
+           filterControl.classList.toggle("controlOn", enable);
+           filterControl.classList.toggle("controlOff", !enable);
+       },
+
+       filterImagesByTag:function(){
+            var selTags = this.getSelectedTags();
+            if(selTags.length>1){
+                alert("filter image error when selected tag length > 1 ")
+                return;
+            }
+            if (!this.filterImageByTagEnabled && selTags.length > 0) {
+                this.filterImageByTagEnabled = true;
+                this.filterImageTagId = selTags[0].id;
+                this.fire('onFilterImageByTag', {enable:true});
+            }
+            else{
+                this.filterImageByTagEnabled = false;
+                this.filterImageTagId = "";
+                this.fire('onFilterImageByTag', {enable:false});
+            }
+       },
        generateRandomColors: function(number){
             /*
             https://stackoverflow.com/questions/10014271/generate-random-color-distinguishable-to-humans

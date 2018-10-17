@@ -129,6 +129,7 @@
         this.seeking = false;//Flag for enabling control over the seek bar while the video is playing, see playingCallback function
         this.selectedRegionId = 0;//Holds the current selected region number
         this.lockTagsEnabled = false;
+        this.filterImageByTagEnabled = false;
         this.selectedTags = [];
         this.uniqueTagId = 0;
         this.videoStartTime = 0; //sometimes videos don't load at absoultue zero
@@ -177,6 +178,7 @@
         this.ctx = this.overlay.getContext("2d");
         this.aspect = 0;
         this.snapWidth = 0;
+        this.allImages = [];
 
       // svg canvas
         let self = this;
@@ -228,6 +230,7 @@
       
       function init() {
             self.controlWrapper.style.display = "grid";
+            self.allImages = self.imagelist;
             //Init variables and controls
             self.frames = self.inputframes? self.inputframes:{};
             self.frameTime = 1/self.framerate;
@@ -344,6 +347,10 @@
               this.showAllRegions();
               this.regionSelected(selected_region)
           });
+    this.addEventListener("onFilterImageByTag",function(e){
+        this.filterImagesByTag(e.detail.enable);
+    });
+          
     },
 
     //snapToAspectRatio: function()
@@ -911,6 +918,7 @@
     //used for init of image directory find way to reduce duplicate code
     initImageDir: function() {
         if (!this.imagelist) return;
+        this.allImages = this.imagelist;
         //$("#rotate").show();
         this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
         var self = this;
@@ -1200,6 +1208,48 @@
         
             this.fire('ontagsubmitted', {tagid:tagId});
         }
+    },
+    filterImagesByTag:function(filterEnable){
+        if(!this.allImages && this.allImages > 0)
+            return;
+        
+        var selTags = this.optionalTags.getSelectedTags();
+        if(selTags.length>1){
+            alert("filter image error when selected tag length > 1 ")
+            return;
+        }
+        //There has to be selected label/s
+        if (filterEnable &&!this.filterImageByTagEnabled && selTags.length > 0) {
+            this.filterImageByTagEnabled = true;
+            var tagId = selTags[0].id;
+            var folderPath = path.dirname(this.allImages[0]);
+            var filterImageList = [];
+            Object.keys(this.frames).forEach(key=>{
+                var existTagFrame = this.frames[key].some(frame=>{
+                    return frame.tags.indexOf(tagId) !== -1
+                });
+                if(existTagFrame){
+                    var imagePath = path.join(folderPath, key);
+                    filterImageList.push(imagePath);
+                }
+            });
+            if(filterImageList.length === 0)
+                alert("Fail to find any image has the tagged region");
+            else{
+                this.imagelist = filterImageList;
+                this.playingCallback();
+            }
+            
+        }
+        else {
+            if(!filterEnable && this.filterImageByTagEnabled === true)
+            {
+                this.filterImageByTagEnabled = false;
+                this.imagelist = this.allImages;
+                this.playingCallback();
+            }
+        }
+        this.optionalTags.toggleEnableFilterImage(this.filterImageByTagEnabled);
     },
     displayVideoTime: function() {
             var currentTime = Math.round(this.video.currentTime);
