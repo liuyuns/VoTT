@@ -1265,7 +1265,10 @@
             if(filterImageList.length === 0)
                 alert("Fail to find any image has the tagged region");
             else{
+                this.imageIndex = filterImageList.indexOf(path.join(folderPath,this.getCurrentFrame()));
                 this.imagelist = filterImageList;
+                if(this.imageIndex === -1)
+                    this.imageIndex = 0;
                 this.playingCallback();
             }
             
@@ -1274,7 +1277,10 @@
             if(!filterEnable && this.filterImageByTagEnabled === true)
             {
                 this.filterImageByTagEnabled = false;
+                this.imageIndex = this.allImages.indexOf(this.imagelist[this.imageIndex]);
                 this.imagelist = this.allImages;
+                if(this.imageIndex === -1)
+                    this.imageIndex = 0;
                 this.playingCallback();
             }
         }
