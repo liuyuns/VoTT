@@ -18,16 +18,19 @@
     <link rel="stylesheet" href="css/imgareaselect-animated.css" />
     <link rel="stylesheet" href="../bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/icons/style.css">
-
+    <link rel="stylesheet" href="../jstree/dist/themes/default/style.min.css" />
+    
     <div id="controlWrapper" class="controlWrapper">
       <playback-control id="playSpeedControl" class="playSpeedControl"></playback-control>
-      <div id='videoWrapper' class="relativeDiv">
-            <svg id="selectionZone" class="selectionZoneStyle" >                  
+      <div id = "listImageWrapper">
+            <div id = "imageJsTree"></div>
+            <div id='videoWrapper' class="relativeDiv">
+                <svg id="selectionZone" class="selectionZoneStyle" >                  
                 </svg>  
-          <div id = "regionLabelDiv" style="width:40px;height:20px;" class="regionLabel" >
-              <span id="regionLabelSpan" class="regionLabelSpan"></span>
-              <span id="closeRegionImage" on-click="deleteRegion" class="closeRegion clickableControl">X</span>
-          </div>
+                <div id = "regionLabelDiv" style="width:40px;height:20px;" class="regionLabel" >
+                <span id="regionLabelSpan" class="regionLabelSpan"></span>
+                <span id="closeRegionImage" on-click="deleteRegion" class="closeRegion clickableControl">X</span>
+                </div>
             
 
               <canvas id="overlay"  on-click='videoClicked' class="overlaystyle" width="100" height="100" >
@@ -41,6 +44,7 @@
                        Your browser does not support the video location.
               </video>
       </div>
+    </div>
       <div id="videoControls" class="videoControls">
         <input id="seekBar" class="seek clickableControl" type="range" min='0' value="0" step="any" onkeydown="return false;"  required />
           <table id="videoControlsTable" class="videoControlsTable">
@@ -919,6 +923,31 @@
     initImageDir: function() {
         if (!this.imagelist) return;
         this.allImages = this.imagelist;
+        
+        if(this.imagelist.length > 0)
+        {
+            var treedata = [];
+            treedata[0] = {"id":"0", "parent":"#",text:path.dirname(this.imagelist[0])};
+            this.imagelist.forEach((image,index) =>{
+                treedata.push({
+                    id:index+1,
+                    parent:"0",
+                    text:path.basename(image)
+                });
+            });
+
+            
+            $("#imageJsTree").on('changed.jstree', function (e, data) {
+                this.imageIndex = data.selected[0] - 1;
+                this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
+                this.playingCallback();
+            }.bind(this)).jstree({
+                "core":{
+                    "data":treedata
+                }
+            });
+    }
+        
         //$("#rotate").show();
         this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
         var self = this;
@@ -991,6 +1020,7 @@
             //fix resize bug
             $(window).off("resize");
             $(window).resize(function(){
+                $("#imageJsTree").jstree("close_all");
                 if (self.video.offsetWidth !== undefined){
                     //self.snapToAspectRatio();
 
@@ -1031,6 +1061,8 @@
             this.frameCanvas.style.margin = topShift + " 0px"; 
             this.selectionZone.style.margin = topShift + " 0px"; 
         }
+
+        $('#imageJsTree').height(this.video.offsetHeight).filter('.default').css('lineHeight', this.video.offsetHeight + 'px');
     },
 
     resizeFrameSize: function(width, height) {
@@ -1372,4 +1404,5 @@
 <script src="js/jquery.imgareaselect.js"></script>
 <script src="../jquery-ui/jquery-ui.min.js"></script>
 <script src="js/system.js"></script>
+<script src="../jstree/dist/jstree.min.js"></script>
 </dom-module>
