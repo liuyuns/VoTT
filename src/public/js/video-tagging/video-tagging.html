@@ -930,7 +930,7 @@
             treedata[0] = {"id":"0", "parent":"#",text:path.dirname(this.imagelist[0])};
             this.imagelist.forEach((image,index) =>{
                 treedata.push({
-                    id:index+1,
+                    id:"image_"+(index+1),
                     parent:"0",
                     text:path.basename(image)
                 });
@@ -939,7 +939,7 @@
             
             $("#imageJsTree").on('changed.jstree', function (e, data) {
                 $('#video-tagging').trigger('stepFwdClicked-BeforeStep');    
-                this.imageIndex = data.selected[0] - 1;
+                this.imageIndex = data.selected[0].replace("image_","") - 1;
                 this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
                 this.playingCallback();
                 $('#video-tagging').trigger('stepBwdClicked-AfterStep');  
