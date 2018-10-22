@@ -486,7 +486,8 @@
             r.y2 = Math.min(this.frameHeight, r.y2 + dy);
         }
 
-        this.createRegion(r.x1, r.y1, r.x2, r.y2);
+        var region = this.createRegion(r.x1, r.y1, r.x2, r.y2);
+        this.regionSelected(region.name)
     },
 
     createRegion: function(x1, y1, x2, y2) {
@@ -519,6 +520,8 @@
         }
         this.emitRegionToHost();//Persist
         this.showAllRegions();
+
+        return region;
     },
     addTagsToRegion: function(selectedTagsArray) {
           var regionId = this.selectedRegionId -1;//Revert to zero-based array
