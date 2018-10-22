@@ -935,9 +935,11 @@
 
             
             $("#imageJsTree").on('changed.jstree', function (e, data) {
+                $('#video-tagging').trigger('stepFwdClicked-BeforeStep');    
                 this.imageIndex = data.selected[0] - 1;
                 this.changeImage(`url(file://${this.imagelist[this.imageIndex].replace(/\\/g,"/")})`);
                 this.playingCallback();
+                $('#video-tagging').trigger('stepBwdClicked-AfterStep');  
             }.bind(this)).jstree({
                 "core":{
                     "data":treedata
