@@ -48,10 +48,6 @@
                       self.fire('ontagdeleted', {tagid:e.target.id});
                   }
                   else {
-                      if(self.filterImageByTagEnabled && e.target.id !== self.filterImageTagId){
-                          alert("Fail to select a differnt tag when FilterImageByTag is enable.");
-                          return;
-                      }
                       self.setSelected(e.target);
                       self.fire('ontagsubmitted', {tagid:e.target.id});
                   }
