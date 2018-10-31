@@ -312,6 +312,9 @@ function openPath(pathName, isDir) {
 
 
               videotagging.src = pathName; 
+              if(!config.tag_colors || videotagging.optionalTags.colors.length > config.tag_colors.length)
+                save();
+
               //track visited frames
               $("#video-tagging").off("stepFwdClicked-AfterStep", updateVisitedFrames);
               $("#video-tagging").on("stepFwdClicked-AfterStep", updateVisitedFrames);
