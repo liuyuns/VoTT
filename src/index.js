@@ -312,7 +312,7 @@ function openPath(pathName, isDir) {
 
 
               videotagging.src = pathName; 
-              if(!config.tag_colors || videotagging.optionalTags.colors.length > config.tag_colors.length)
+              if(config && (!config.tag_colors || videotagging.optionalTags.colors.length > config.tag_colors.length))
                 save();
 
               //track visited frames
